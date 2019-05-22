@@ -1,4 +1,14 @@
 {
   "Dashboard": "Anasayfa",
-  "Project List":"Proje Listesi"
+  "Project List":"Proje Listesi",
+  "New": "Yeni",
+  "Project Detail": "Proje detay",
+  "Project Code": "Proje kodu",
+  "Project Code is required": "Proje kodu gerekli",
+  "Project Code should be (min) 2 char": "Proje kodu en az 2 karakter olmalı",
+  "Project Name": "Proje İsmi",
+  "Project Name should be (min) 4 char": "Proje ismi en az 4 karakter olmalı",
+  "Project Manager is required": "Proje Yöneticisi Gerekli",
+  "Close": "Kapat",
+  "Save": "Kaydet"
 }
