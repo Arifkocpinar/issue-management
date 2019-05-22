@@ -39,8 +39,8 @@ export class IssueHistoryService{
     ));
   }
 
-  createProject(user) : Observable<any>{
-    return this.apiService.post(this.ISSUE_HISTORY_PATH,user).pipe(map(
+  createUserHistory(userHistory) : Observable<any>{
+    return this.apiService.post(this.ISSUE_HISTORY_PATH,userHistory).pipe(map(
       res =>{
         if(res){
           return res;
