@@ -47,25 +47,24 @@
         </div>
 
         <div class="form-group">
-          <label>{{'Project Name'| translate}}asdf</label>
+        <label>{{'Project Name'| translate}}</label>
 
-          <input type="text" formControlName="projectName" class="form-control" [ngClass]="{ 'is-invalid': f.projectName.errors }" />
-          <div *ngIf="f.projectName.errors" class="invalid-feedback">
-            <div *ngIf="f.projectName.errors.required">{{'Project Name is required'| translate}}</div>
-            <div *ngIf="f.projectName.errors.minlength">{{'Project Name should be (min) 4 char'| translate}}</div>
-          </div>
+        <input type="text" formControlName="projectName" class="form-control" [ngClass]="{ 'is-invalid': f.projectName.errors }" />
+        <div *ngIf="f.projectName.errors" class="invalid-feedback">
+          <div *ngIf="f.projectName.errors.required">{{'Project Name is required'| translate}}</div>
+          <div *ngIf="f.projectName.errors.minlength">{{'Project Name should be (min) 4 char'| translate}}</div>
         </div>
-
+      </div>
         <div class="form-group">
           <label>{{'Project Manager'| translate}}</label>
 
           <select formControlName="managerId" class="form-control" [ngClass]="{ 'is-invalid': f.managerId.errors }" >
-            <option *ngFor="let val of managerOptions" [value]="val.id">{{val.nameSurname}}</option>
+            <option *ngFor="let opt of managerOptions" [value]="opt.id">{{opt.nameSurname}}</option>
           </select>
           <div *ngIf="f.managerId.errors" class="invalid-feedback">
-            <div *ngIf="f.managerId.errors.required">{{'Project Manager is required'| translate}}</div>
-          </div>
+            <div *ngIf="f.managerId.errors.required">{{'Project Name is required'| translate}}</div>          </div>
         </div>
+
 
         <div class="modal-footer" >
           <button class="btn btn-light" (click)="closeAndResetModal()">{{ 'Close' | translate }}</button>

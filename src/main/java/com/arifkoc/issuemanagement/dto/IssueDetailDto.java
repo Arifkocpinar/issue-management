@@ -3,13 +3,16 @@ package com.arifkoc.issuemanagement.dto;
 import com.arifkoc.issuemanagement.Entity.IssueStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @ApiModel(value = "Issue Data Transfer Object")
-public class IssueDto {
+public class IssueDetailDto {
     @ApiModelProperty(required = true,value = "ID")
     private Long id;
     @ApiModelProperty(required = true,value = "Description")
@@ -24,5 +27,7 @@ public class IssueDto {
     private UserDto assignee;
     @ApiModelProperty(required = true,value = "Project")
     private ProjectDto project;
-    private Long projectId;
+
+    @ApiModelProperty(required = true,value = "Issue Histories")
+    private List<IssueHistoryDto> issueHistories;
 }

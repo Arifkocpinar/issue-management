@@ -4,6 +4,7 @@ import {Page} from "../../common/page";
 import {BsModalRef, BsModalService} from "ngx-bootstrap";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ConfirmationComponent} from "../../shared/confirmation/confirmation.component";
+import {UserService} from "../../services/shared/user.service";
 @Component({
   selector: 'app-project',
   templateUrl: './project.component.html',
@@ -16,8 +17,12 @@ export class ProjectComponent implements OnInit {
   page = new Page();
   cols = [];
   rows = [];
+  managerOptions=[];
 
-  constructor(private projectService: ProjectService, private modalService: BsModalService, private formBuilder: FormBuilder) {
+  constructor(private projectService: ProjectService,
+              private modalService: BsModalService,
+              private formBuilder: FormBuilder,
+              private userService:UserService) {
   }
 
   ngOnInit() {
@@ -25,13 +30,19 @@ export class ProjectComponent implements OnInit {
       {prop: 'id', name: 'No'},
       {prop: 'projectName', name: 'Project Name', sortable: false},
       {prop: 'projectCode', name: 'Project Code', sortable: false},
+      {prop: 'manager.nameSurname', name: 'Manager', sortable: false},
       {prop:'id',name:'Actions',cellTemplate:this.tplProjectDeleteCell,flexGrow: 1, sortable:false}
       ];
     this.setPage({offset: 0});
 
     this.projectForm = this.formBuilder.group({
       'projectCode': [null, [Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
-      'projectName': [null, [Validators.required, Validators.minLength(4)]]
+      'projectName': [null, [Validators.required, Validators.minLength(4)]],
+      'managerId': [null, [Validators.required]]
+    });
+    this.userService.getAll().subscribe(respose =>{
+      this.managerOptions=respose;
+      console.log(respose);
     });
   }
 
@@ -44,14 +55,14 @@ export class ProjectComponent implements OnInit {
   saveProject() {
     if(!this.projectForm.valid)
       return;
-
+    console.log(this.projectForm.value);
     this.projectService.createProject(this.projectForm.value).subscribe(
       response => {
-        console.log(response);
+        this.setPage({ offset: 0 });
+        this.closeAndResetModal();
       }
     )
-    this.setPage({ offset: 0 });
-    this.closeAndResetModal();
+
   }
 
   closeAndResetModal(){

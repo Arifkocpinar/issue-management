@@ -25,6 +25,18 @@ export class ProjectService{
       }
     ));
   }
+  getAlll() : Observable<any>{
+    return this.apiService.get(this.PROJECT_PATH).pipe(map(
+      res =>{
+        if(res){
+          return res;
+        }else{
+          console.log(res);
+          return {};
+        }
+      }
+    ));
+  }
 
   getById(id) : Observable<any>{
     return this.apiService.get(this.PROJECT_PATH,id).pipe(map(

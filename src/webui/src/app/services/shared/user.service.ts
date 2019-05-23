@@ -8,13 +8,13 @@ import {map} from "rxjs/internal/operators";
 })
 export class UserService{
 
-  private USER_PATH = "/user";
+  private USER_PATH = "/users";
 
   constructor(private apiService: ApiService ){
   }
 
-  getAll(page) : Observable<any>{
-    return this.apiService.get(this.USER_PATH+'/pagination',page).pipe(map(
+  getAll() : Observable<any>{
+    return this.apiService.get(this.USER_PATH).pipe(map(
       res =>{
         if(res){
           return res;
