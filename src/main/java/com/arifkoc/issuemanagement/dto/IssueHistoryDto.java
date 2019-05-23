@@ -14,7 +14,7 @@ public class IssueHistoryDto {
     @ApiModelProperty(value = "Id of IssueHistory")
     private Long id;
     @ApiModelProperty(value = "issueDto of IssueHistory")
-    private IssueDto issueDto;
+    private IssueDto issue;
     @ApiModelProperty(value = "description of IssueHistory")
     private String description;
     @ApiModelProperty(value = "date of IssueHistory")
@@ -24,6 +24,6 @@ public class IssueHistoryDto {
     @ApiModelProperty(value = "details of IssueHistory")
     private String details;
     @ApiModelProperty(value = "userDto of IssueHistory")
-    private UserDto userDto;
+    private UserDto assignee;
 
 }

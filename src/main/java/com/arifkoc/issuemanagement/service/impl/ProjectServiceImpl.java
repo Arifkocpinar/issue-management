@@ -1,6 +1,7 @@
 package com.arifkoc.issuemanagement.service.impl;
 
 import com.arifkoc.issuemanagement.Entity.Project;
+import com.arifkoc.issuemanagement.Entity.User;
 import com.arifkoc.issuemanagement.dto.ProjectDto;
 import com.arifkoc.issuemanagement.repo.ProjectRepository;
 import com.arifkoc.issuemanagement.service.ProjectService;
@@ -17,9 +18,11 @@ import java.util.List;
 public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
     private final ModelMapper modelMapper;
-    public ProjectServiceImpl(ProjectRepository projectRepository , ModelMapper modelMapper){
+    private final UserServiceImpl userServiceImpl;
+    public ProjectServiceImpl(ProjectRepository projectRepository , UserServiceImpl userServiceImpl,ModelMapper modelMapper){
         this.projectRepository=projectRepository;
         this.modelMapper=modelMapper;
+        this.userServiceImpl=userServiceImpl;
     }
 
     @Override
@@ -28,6 +31,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (control != null)
             throw new IllegalArgumentException("Project Code Already Exist");
         Project p=modelMapper.map(projectDto,Project.class);
+        p.setManager(modelMapper.map(userServiceImpl.getById(projectDto.getManagerId()), User.class));
         p=projectRepository.save(p);
         projectDto.setId(p.getId());
         return projectDto;
@@ -79,5 +83,10 @@ public class ProjectServiceImpl implements ProjectService {
         projectDb.setProjectCode(projectDto.getProjectCode());
         projectRepository.save(projectDb);
         return modelMapper.map(projectDb,ProjectDto.class);
+    }
+
+    public List<ProjectDto> getAll() {
+        List<Project> data = projectRepository.findAll();
+        return Arrays.asList(modelMapper.map(data,ProjectDto[].class));
     }
 }

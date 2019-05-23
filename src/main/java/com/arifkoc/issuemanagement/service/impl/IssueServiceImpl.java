@@ -1,8 +1,16 @@
 package com.arifkoc.issuemanagement.service.impl;
 
 import com.arifkoc.issuemanagement.Entity.Issue;
+import com.arifkoc.issuemanagement.Entity.IssueStatus;
+import com.arifkoc.issuemanagement.Entity.User;
+import com.arifkoc.issuemanagement.dto.IssueDetailDto;
 import com.arifkoc.issuemanagement.dto.IssueDto;
+import com.arifkoc.issuemanagement.dto.IssueHistoryDto;
+import com.arifkoc.issuemanagement.dto.IssueUpdateDto;
 import com.arifkoc.issuemanagement.repo.IssueRepository;
+import com.arifkoc.issuemanagement.repo.ProjectRepository;
+import com.arifkoc.issuemanagement.repo.UserRepository;
+import com.arifkoc.issuemanagement.service.IssueHistoryService;
 import com.arifkoc.issuemanagement.service.IssueService;
 import com.arifkoc.issuemanagement.util.TPage;
 import org.modelmapper.ModelMapper;
@@ -10,61 +18,96 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
 @Service
 public class IssueServiceImpl implements IssueService {
 
     private final IssueRepository issueRepository;
+    private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
+    private final IssueHistoryService issueHistoryService;
     private final ModelMapper modelMapper;
 
-    public IssueServiceImpl(IssueRepository issueRepository,ModelMapper modelMapper){
-        this.issueRepository=issueRepository;
-        this.modelMapper=modelMapper;
+    public IssueServiceImpl(IssueRepository issueRepository,ProjectRepository projectRepository, UserRepository userRepository, IssueHistoryService issueHistoryService, ModelMapper modelMapper) {
+        this.issueRepository = issueRepository;
+        this.modelMapper = modelMapper;
+        this.issueHistoryService = issueHistoryService;
+        this.userRepository =userRepository;
+        this.projectRepository=projectRepository;
     }
 
     @Override
-    public IssueDto save(IssueDto issueDto) {
-        if(issueDto.getDate() == null)
-            throw new IllegalArgumentException("Issue Date Cannot Be Null!!");
+    public IssueDto save(IssueDto issue) {
+        // Bussiness Logic
+        issue.setDate(new Date());
+        issue.setIssueStatus(IssueStatus.OPEN);
 
-        Issue issueDb= modelMapper.map(issueDto,Issue.class);
-        issueDb=issueRepository.save(issueDb);
-        return modelMapper.map(issueDb,IssueDto.class);
+
+        Issue issueEntity = modelMapper.map(issue, Issue.class);
+
+        issueEntity.setProject(projectRepository.getOne(issue.getProjectId()));
+        issueEntity = issueRepository.save(issueEntity);
+
+        issue.setId(issueEntity.getId());
+        return issue;
+    }
+
+    @Transactional
+    public IssueDetailDto update(Long id, IssueUpdateDto issue) {
+        Issue issueDb = issueRepository.getOne(id);
+        User user = userRepository.getOne(issue.getAssignee_id());
+        issueHistoryService.addHistory(id,issueDb);
+
+        issueDb.setAssignee(user);
+        issueDb.setDate(issue.getDate());
+        issueDb.setDescription(issue.getDescription());
+        issueDb.setDetails(issue.getDetails());
+        issueDb.setIssueStatus(issue.getIssueStatus());
+        issueDb.setProject(projectRepository.getOne(issue.getProject_id()));
+        issueRepository.save(issueDb);
+        return getByIdWithDetails(id);
     }
 
     @Override
     public IssueDto getById(Long id) {
-        return null;
+        Issue issue = issueRepository.getOne(id);
+        return modelMapper.map(issue, IssueDto.class);
+    }
+
+    public IssueDetailDto getByIdWithDetails(Long id) {
+        Issue issue = issueRepository.getOne(id);
+        IssueDetailDto detailDto = modelMapper.map(issue, IssueDetailDto.class);
+        List<IssueHistoryDto> issueHistoryDtos = issueHistoryService.getByIssueId(issue.getId());
+        detailDto.setIssueHistories(issueHistoryDtos);
+        return detailDto;
     }
 
     @Override
     public TPage<IssueDto> getAllPageable(Pageable pageable) {
-        Page<Issue> data= issueRepository.findAll(pageable);
-        TPage page= new TPage<IssueDto>();
-        IssueDto[] dtos = modelMapper.map(data.getContent(),IssueDto[].class);
-        page.setStat(data, Arrays.asList(dtos));
-        return page;
+        Page<Issue> data = issueRepository.findAll(pageable);
+        TPage<IssueDto> respnose = new TPage<IssueDto>();
+        respnose.setStat(data, Arrays.asList(modelMapper.map(data.getContent(), IssueDto[].class)));
+        return respnose;
+    }
+
+    public List<IssueDto> getAll() {
+        List<Issue> data = issueRepository.findAll();
+        return Arrays.asList(modelMapper.map(data, IssueDto[].class));
     }
 
     @Override
-    public Boolean delete(Long id) {
-        issueRepository.deleteById(id);
+    public Boolean delete(Long issueId) {
+        issueRepository.deleteById(issueId);
         return true;
     }
 
     @Override
-    public IssueDto update(Long id, IssueDto issueDto) {
-        Issue issueDb= issueRepository.getOne(id);
-        if(issueDb == null)
-            throw new IllegalArgumentException("Project does not exist ID:"+id);
-        //Proje kodu kendinden başka varmı kontrolu
-        //Issue control=issueRepository.getByProjectCodeAndIdNot(issueDto.getProjectCode(),id);
-        //if (control != null )
-         //   throw new IllegalArgumentException("Project Code Already Exist");
-        //issueDb.setProjectName(issueDto.getProjectName());
-        //issueDb.setProjectCode(issueDto.getProjectCode());
-        //issueRepository.save(issueDto);
-        //modelMapper.map(issueDb,IssueDto.class);
+    public IssueDto update(Long id, IssueDto project) {
         return null;
     }
+
 }
